@@ -11,43 +11,47 @@ const GH = window.GH;
 
 function populatePRLinks() {
     const rapidViewId = GH.RapidBoard.State.data.rapidViewId;
-    const issues = GH.WorkDataLoader.getDataForViewId(rapidViewId).data.issuesData.issues;
 
-    const issuesToCheckForPR = issues.filter((issue) =>
-        issue.statusName !== 'Open' && issue.statusName !== 'Closed'
-    );
+    GH.WorkDataLoader.getData(rapidViewId)
+        .then((data) => {
+            const issues = data.issuesData.issues;
 
-    const githubPullRegex =  /^http.*github.com\/.*\/pull\/.*/;
+            const issuesToCheckForPR = issues.filter((issue) =>
+                issue.statusName !== 'Open' && issue.statusName !== 'Closed'
+            );
 
-    issuesToCheckForPR.forEach((issue) => {
-        const issueKey = issue.key;
+            const githubPullRegex =  /^http.*github.com\/.*\/pull\/.*/;
 
-        $.ajax(`/rest/api/2/issue/${issueKey}/remotelink`)
-            .then((links) => {
-                const githubLinks = links.filter((link) =>
-                    githubPullRegex.test(link.object.url)
-                );
+            issuesToCheckForPR.forEach((issue) => {
+                const issueKey = issue.key;
 
-                if (!githubLinks.length) {
-                    return;
-                }
+                $.ajax(`/rest/api/2/issue/${issueKey}/remotelink`)
+                    .then((links) => {
+                        const githubLinks = links.filter((link) =>
+                            githubPullRegex.test(link.object.url)
+                        );
 
-                const $issueEndDiv = $(`.ghx-issue[data-issue-key=${issueKey}] .ghx-end`);
-                const $prDiv = $issueEndDiv.append($('<div class="jchi-prs"></div>'));
+                        if (!githubLinks.length) {
+                            return;
+                        }
 
-                githubLinks.forEach((link) => {
-                    const linkTitle = link.object.summary || link.object.title;
-                    const $linkAnchor = $prDiv.append($(`<a href="${link.object.url}"></a>`));
-                    $linkAnchor.append($(`<img style="cursor: pointer; float: left; margin-right: 2px;" title="${linkTitle}" width=16 height=16 src="${link.object.icon.url16x16}">`));
+                        const $issueEndDiv = $(`.ghx-issue[data-issue-key=${issueKey}] .ghx-end`);
+                        const $prDiv = $issueEndDiv.append($('<div class="jchi-prs"></div>'));
 
-                    $linkAnchor.on('click', () => {
-                        window.open(link.object.url, '_blank');
+                        githubLinks.forEach((link) => {
+                            const linkTitle = link.object.summary || link.object.title;
+                            const $linkAnchor = $prDiv.append($(`<a href="${link.object.url}"></a>`));
+                            $linkAnchor.append($(`<img style="cursor: pointer; float: left; margin-right: 2px;" title="${linkTitle}" width=16 height=16 src="${link.object.icon.url16x16}">`));
+
+                            $linkAnchor.on('click', () => {
+                                window.open(link.object.url, '_blank');
+                            });
+                        });
                     });
-                });
             });
-    });
 
-    GH.CallbackManager.registerCallback(GH.WorkController.CALLBACK_POOL_RENDERED, 'SelectMostAppropriateIssueCallback', populatePRLinks);
+            GH.CallbackManager.registerCallback(GH.WorkController.CALLBACK_POOL_RENDERED, 'SelectMostAppropriateIssueCallback', populatePRLinks);
+        });
 }
 
 GH.CallbackManager.registerCallback(GH.WorkController.CALLBACK_POOL_RENDERED, 'SelectMostAppropriateIssueCallback', populatePRLinks);
