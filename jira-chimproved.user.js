@@ -35,10 +35,10 @@ function populatePRLinks() {
                             return;
                         }
 
-                        const $issueEndDiv = $(`.ghx-issue[data-issue-key=${issueKey}] .ghx-end`);
+                        const $issueCornerDiv = $(`.ghx-issue[data-issue-key=${issueKey}] .ghx-corner`);
 
-                        const $prDiv = $('<div class="jchi-prs"></div>');
-                        $issueEndDiv.append($prDiv);
+                        const $prDiv = $('<div class="jchi-prs" style="float: left;"></div>');
+                        $issueCornerDiv.append($prDiv);
 
                         githubLinks.forEach((link) => {
                             const linkTitle = link.object.summary || link.object.title;
