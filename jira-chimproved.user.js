@@ -11,7 +11,7 @@ const GH = window.GH;
 
 function populatePRLinks() {
     const rapidViewId = GH.RapidBoard.State.data.rapidViewId;
-    const issues = GH.WorkDataLoader.getData(rapidViewId).data.issuesData.issues;
+    const issues = GH.WorkDataLoader.getDataForViewId(rapidViewId).data.issuesData.issues;
 
     const issuesToCheckForPR = issues.filter((issue) =>
         issue.statusName !== 'Open' && issue.statusName !== 'Closed'
