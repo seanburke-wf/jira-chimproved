@@ -36,11 +36,16 @@ function populatePRLinks() {
                         }
 
                         const $issueEndDiv = $(`.ghx-issue[data-issue-key=${issueKey}] .ghx-end`);
-                        const $prDiv = $issueEndDiv.append($('<div class="jchi-prs"></div>'));
+
+                        const $prDiv = $('<div class="jchi-prs"></div>');
+                        $issueEndDiv.append($prDiv);
 
                         githubLinks.forEach((link) => {
                             const linkTitle = link.object.summary || link.object.title;
-                            const $linkAnchor = $prDiv.append($(`<a href="${link.object.url}"></a>`));
+
+                            const $linkAnchor = $(`<a href="${link.object.url}"></a>`);
+                            $prDiv.append($linkAnchor);
+
                             $linkAnchor.append($(`<img style="cursor: pointer; float: left; margin-right: 2px;" title="${linkTitle}" width=16 height=16 src="${link.object.icon.url16x16}">`));
 
                             $linkAnchor.on('click', () => {
